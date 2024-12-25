@@ -10,11 +10,33 @@ import (
 
 // CreateOrder
 func CreateOrder(c *gin.Context) {
-	var order models.Order
+	var input struct {
+		UserID     int   `json:"user_id"`
+		ProductIDs []int `json:"product_ids"`
+	}
 
-	if err := c.ShouldBindJSON(&order); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	var products []models.Product
+	if err := config.DB.Where("id IN ?", input.ProductIDs).Find(&products).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Calculate the totalCost
+	totalCost := 0.0
+	for _, product := range products {
+		totalCost += product.Price
+	}
+
+	// Create the order
+	order := models.Order{
+		UserID:    input.UserID,
+		TotalCost: totalCost,
+		Products:  products,
 	}
 
 	if err := config.DB.Create(&order).Error; err != nil {
@@ -22,8 +44,13 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, order)
+	// // Associate the products with the order
+	// if err := config.DB.Model(&order).Association("Products").Append(&products); err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
+	c.JSON(http.StatusCreated, order)
 }
 
 // GetOrders
@@ -66,7 +93,7 @@ func UpdateOrder(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Model(&order).Where("id = ?", id).Updates(&order).Error; err != nil {
+	if err := config.DB.Save(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
