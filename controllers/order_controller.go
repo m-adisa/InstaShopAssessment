@@ -20,6 +20,19 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
+	// Check if the user exists
+	var user models.User
+	if err := config.DB.First(&user, input.UserID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Validate the input
+	if len(input.ProductIDs) < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "At least one product ID is required"})
+		return
+	}
+
 	var products []models.Product
 	if err := config.DB.Where("id IN ?", input.ProductIDs).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -43,12 +56,6 @@ func CreateOrder(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	// // Associate the products with the order
-	// if err := config.DB.Model(&order).Association("Products").Append(&products); err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
 
 	c.JSON(http.StatusCreated, order)
 }

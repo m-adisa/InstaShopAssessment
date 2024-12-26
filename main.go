@@ -3,11 +3,15 @@ package main
 import (
 	"instashop/config"
 	"instashop/routes"
+	"instashop/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Initialize validator
+	utils.InitValidator()
+
 	// Connect to the database
 	config.ConnectDatabase()
 
