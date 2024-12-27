@@ -15,7 +15,7 @@ func OrderRoutes(router *gin.Engine) {
 	{
 		orderRoutes.POST("/create", controllers.CreateOrder)
 		orderRoutes.GET("/", controllers.GetOrders)
-		orderRoutes.PUT("/:id", controllers.CancelOrder)
+		orderRoutes.PUT("/cancel/:id", controllers.CancelOrder)
 	}
 
 	adminRoutes := orderRoutes.Group("/")

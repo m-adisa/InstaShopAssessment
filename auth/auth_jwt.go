@@ -104,6 +104,7 @@ func ValidateToken() gin.HandlerFunc {
 		c.Set("user_email", claims.Email)
 		c.Set("user_role", claims.Role)
 		c.Set("user_id", claims.UserID)
+		// c.Set("user_id", fmt.Sprintf("%d", claims.UserID))
 		c.Set("user_name", claims.UserName)
 
 		c.Next()
