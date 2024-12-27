@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"instashop/auth"
 	"instashop/config"
 	"instashop/models"
 	"instashop/utils"
@@ -32,7 +33,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	// Hash the password
-	hashedPassword, err := utils.HashPassword(user.Password)
+	hashedPassword, err := auth.HashPassword(user.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -45,7 +46,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	// Generate JWT token
-	token, err := config.GenerateToken(&user)
+	token, err := auth.GenerateToken(&user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -53,6 +54,39 @@ func SignUp(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
+		"token":   token,
+		"user":    user,
+	})
+}
+
+func LoginUser(c *gin.Context) {
+	var credentials models.User
+
+	if err := c.ShouldBindJSON(&credentials); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	if err := config.DB.Where("email = ?", credentials.Email).First((&user)).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	// Compare Password
+	if !auth.ComparePassword(credentials.Password, user.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	token, err := auth.GenerateToken(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User logged in successfully",
 		"token":   token,
 	})
 }

@@ -1,19 +1,22 @@
 package routes
 
 import (
+	"instashop/auth"
 	"instashop/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func OrderRoutes(router *gin.Engine) {
-	orders := router.Group("/orders")
+	orderRoutes := router.Group("/orders")
+
+	orderRoutes.Use(auth.ValidateToken())
 
 	{
-		orders.POST("/", controllers.CreateOrder)
-		orders.GET("/", controllers.GetOrders)
-		orders.GET("/:id", controllers.GetOrderByID)
-		orders.PUT("/:id", controllers.UpdateOrder)
-		orders.DELETE("/:id", controllers.DeleteOrder)
+		orderRoutes.POST("/", controllers.CreateOrder)
+		orderRoutes.GET("/", controllers.GetOrders)
+		orderRoutes.GET("/:id", controllers.GetOrderByID)
+		orderRoutes.PUT("/:id", controllers.UpdateOrder)
+		orderRoutes.DELETE("/:id", controllers.DeleteOrder)
 	}
 }

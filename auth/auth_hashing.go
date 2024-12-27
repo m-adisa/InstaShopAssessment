@@ -1,4 +1,4 @@
-package utils
+package auth
 
 import (
 	"crypto/rand"
@@ -54,21 +54,17 @@ func HashPassword(password string) (encodedHash string, err error) {
 	return encodedHash, nil
 }
 
-func CheckPasswordHash(password, hash string) (match bool, err error) {
+func ComparePassword(password, hash string) (match bool) {
 	p, salt, hashValue, err := decodeHash(hash)
 	if err != nil {
-		return false, err
+		return false
 	}
 
 	// Derive the key from the other password using the same parameters
 	otherHash := argon2.IDKey([]byte(password), []byte(salt), p.Iterations, p.Memory, p.Parallelism, p.KeyLength)
 
 	// Check if the hashes are equal
-	if subtle.ConstantTimeCompare(hashValue, otherHash) == 1 {
-		return true, nil
-	}
-
-	return false, nil
+	return subtle.ConstantTimeCompare(hashValue, otherHash) == 1
 }
 
 func generateRandomBytes(n uint32) ([]byte, error) {
