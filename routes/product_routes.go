@@ -11,13 +11,16 @@ func ProductRoutes(router *gin.Engine) {
 	productRoutes := router.Group("/products")
 
 	productRoutes.Use(auth.ValidateToken())
-	productRoutes.Use(auth.AdminOnly)
-
 	{
-		productRoutes.POST("/", controllers.CreateProduct)
 		productRoutes.GET("/", controllers.GetProducts)
-		// products.GET("/:id", controllers.GetProductByID)
-		// products.PUT("/:id", controllers.UpdateProduct)
-		// products.DELETE("/:id", controllers.DeleteProduct)
+		productRoutes.GET("/:id", controllers.GetProductByID)
+	}
+
+	adminRoutes := productRoutes.Group("/")
+	adminRoutes.Use(auth.AdminOnly)
+	{
+		adminRoutes.POST("/", controllers.CreateProduct)
+		adminRoutes.PUT("/:id", controllers.UpdateProduct)
+		adminRoutes.DELETE("/:id", controllers.DeleteProduct)
 	}
 }

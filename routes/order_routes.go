@@ -13,10 +13,14 @@ func OrderRoutes(router *gin.Engine) {
 	orderRoutes.Use(auth.ValidateToken())
 
 	{
-		orderRoutes.POST("/", controllers.CreateOrder)
+		orderRoutes.POST("/create", controllers.CreateOrder)
 		orderRoutes.GET("/", controllers.GetOrders)
-		orderRoutes.GET("/:id", controllers.GetOrderByID)
-		orderRoutes.PUT("/:id", controllers.UpdateOrder)
-		orderRoutes.DELETE("/:id", controllers.DeleteOrder)
+		orderRoutes.PUT("/:id", controllers.CancelOrder)
+	}
+
+	adminRoutes := orderRoutes.Group("/")
+	adminRoutes.Use(auth.AdminOnly)
+	{
+		adminRoutes.PUT("/status/:id", controllers.UpdateOrderStatus)
 	}
 }

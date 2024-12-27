@@ -72,21 +72,26 @@ func GetOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
-// GetOrderByID
-func GetOrderByID(c *gin.Context) {
+// Cancel an Order
+func CancelOrder(c *gin.Context) {
 	var order models.Order
 	id := c.Param("id")
 
-	if err := config.DB.Preload("Products").First(&order, id).Error; err != nil {
+	if err := config.DB.First(&order, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, order)
+	if err := config.DB.Delete(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Order deleted successfully"})
 }
 
-// UpdateOrder
-func UpdateOrder(c *gin.Context) {
+// UpdateOrderStatus
+func UpdateOrderStatus(c *gin.Context) {
 	var order models.Order
 	id := c.Param("id")
 
@@ -106,22 +111,4 @@ func UpdateOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, order)
-}
-
-// DeleteOrder
-func DeleteOrder(c *gin.Context) {
-	var order models.Order
-	id := c.Param("id")
-
-	if err := config.DB.First(&order, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
-		return
-	}
-
-	if err := config.DB.Delete(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Order deleted successfully"})
 }

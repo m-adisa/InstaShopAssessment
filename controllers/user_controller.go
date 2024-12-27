@@ -55,7 +55,7 @@ func SignUp(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
 		"token":   token,
-		"user":    user,
+		"email":   user.Email,
 	})
 }
 

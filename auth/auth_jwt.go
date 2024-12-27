@@ -28,6 +28,8 @@ func GenerateToken(user *models.User) (string, error) {
 		log.Fatalf("Error loading .env file. Error: %v", err)
 	}
 
+	JwtSecret := []byte(os.Getenv("JwtSecret"))
+
 	expirationTime := time.Now().Add(24 * time.Hour)
 
 	claims := &Claims{
@@ -43,7 +45,7 @@ func GenerateToken(user *models.User) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString(os.Getenv("JwtSecret"))
+	tokenString, err := token.SignedString(JwtSecret)
 	if err != nil {
 		log.Fatal("Error in creating token")
 	}
@@ -53,6 +55,14 @@ func GenerateToken(user *models.User) (string, error) {
 
 // Middleware to validate token
 func ValidateToken() gin.HandlerFunc {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file. Error: %v", err)
+	}
+
+	JwtSecret := []byte(os.Getenv("JwtSecret"))
+
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -76,7 +86,7 @@ func ValidateToken() gin.HandlerFunc {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
-				return os.Getenv("JwtSecret"), nil
+				return JwtSecret, nil
 			})
 		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
