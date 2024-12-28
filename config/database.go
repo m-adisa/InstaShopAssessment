@@ -2,6 +2,7 @@ package config
 
 import (
 	"instashop/models"
+	"path/filepath"
 
 	"fmt"
 	"log"
@@ -15,10 +16,22 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
+	// Determine environment
+	environment := os.Getenv("TESTING")
+
+	var envFile string
+
+	if environment == "true" {
+		cwd, _ := os.Getwd()
+		envFile = filepath.Join(cwd, "../.env.test")
+	} else {
+		envFile = ".env"
+	}
+
+	// Load appropriate environment variables
+	err := godotenv.Load(envFile)
 	if err != nil {
-		log.Fatalf("Error loading .env file. Error: %v", err)
+		log.Fatalf("Error loading %s file. Error: %v", envFile, err)
 	}
 
 	// Build the DSN
@@ -37,11 +50,13 @@ func ConnectDatabase() {
 
 	fmt.Println("Connected to database successfully!")
 
-	// Migrate the database
-	err = DB.AutoMigrate(&models.Product{}, &models.User{}, &models.Order{})
-	if err != nil {
-		log.Fatalf("Failed to migrate database. Error: %v", err)
-	}
+	if environment != "true" {
+		// Migrate the database
+		err = DB.AutoMigrate(&models.Product{}, &models.User{}, &models.Order{})
+		if err != nil {
+			log.Fatalf("Failed to migrate database. Error: %v", err)
+		}
 
-	fmt.Println("Database migrated successfully!")
+		fmt.Println("Database migrated successfully!")
+	}
 }

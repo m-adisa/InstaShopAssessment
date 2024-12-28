@@ -5,6 +5,11 @@ INSTASHOP ASSESSMENT
 ## Language and Framework
 The language is Go and the framework is Gin.
 
+## Environment Variables
+A `.env.example` file is provided as a model of the required environment variables.
+- Create a `.env` file with the required variables to run the application.
+- Create a `.env.test` file with the required variables to run the test suite.
+
 ## Database
 The database is a PostgreSQL database and the ORM is GORM.
 
@@ -31,3 +36,6 @@ There are signup and login endpoints. In signing up, the `role` field can only e
 
 # Documentation
 The documentation is done with Swagger. You can find it available at http://localhost:8080/docs/index.html
+
+# Testing
+To run the test suite, run `go test ./tests`
