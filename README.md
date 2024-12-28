@@ -1,6 +1,8 @@
 # InstaShopAssessment
 INSTASHOP ASSESSMENT
 
+To run the application, run `go run main.go`
+
 # Implementation Details
 ## Language and Framework
 The language is Go and the framework is Gin.
