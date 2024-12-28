@@ -28,3 +28,6 @@ There are signup and login endpoints. In signing up, the `role` field can only e
 ## Order
 - Authenticated users can create, get order and cancel an order
 - Only an admin can update the status of an order
+
+# Documentation
+The documentation is done with Swagger. You can find it available at http://localhost:8080/docs/index.html

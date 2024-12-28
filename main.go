@@ -43,7 +43,7 @@ func main() {
 	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	docs.SwaggerInfo.BasePath = "/"
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.NewHandler()))
 
 	// Start the server
 	router.Run(":8080")
