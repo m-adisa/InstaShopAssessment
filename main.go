@@ -14,12 +14,13 @@ import (
 // @title Instashop API
 // @version 1.0
 // @description This API is for Instashop Assessment
-// @termsOfService http://swagger.io/terms/
 // @contact.name API Support
-// @contact.url http://www.swagger.io/support
 // @contact.email iconmoa@gmail.com.com
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 	// Initialize validator

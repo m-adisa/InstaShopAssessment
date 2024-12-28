@@ -50,7 +50,7 @@ func GenerateToken(user *models.User) (string, error) {
 		log.Fatal("Error in creating token")
 	}
 
-	return tokenString, nil
+	return "Bearer " + tokenString, nil
 }
 
 // Middleware to validate token

@@ -19,7 +19,7 @@ func ProductRoutes(router *gin.Engine) {
 	adminRoutes := productRoutes.Group("/")
 	adminRoutes.Use(auth.AdminOnly)
 	{
-		adminRoutes.POST("/", controllers.CreateProduct)
+		adminRoutes.POST("/create", controllers.CreateProduct)
 		adminRoutes.PUT("/:id", controllers.UpdateProduct)
 		adminRoutes.DELETE("/:id", controllers.DeleteProduct)
 	}
